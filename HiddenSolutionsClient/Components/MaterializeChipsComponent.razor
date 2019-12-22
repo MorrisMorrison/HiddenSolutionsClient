@@ -1,0 +1,53 @@
+@using System.Collections
+@using System.Text.Json
+@using Newtonsoft.Json
+@inherits MaterializeBaseComponent
+@inject IJSRuntime JSRuntime
+
+<div id="@Id" name="@Name" class="chips chips-placeholder"></div>
+
+@code{
+    
+    public IList<string> Chips { get; set; }
+    
+    private void OnChipsAdd()
+    {
+        Console.WriteLine("Added Chip");
+    }
+    
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // JSRuntime.InvokeVoidAsync("materializeHelpers.initChips", @"console.log(""Chips added js"")");
+            JSRuntime.InvokeAsync<object>("callbackProxy", DotNetObjectReference.Create(this), "initChips", "GetChipsDataCallBack");
+        }
+    }
+    
+    [JSInvokable] // This is required for callable function in JS
+    public void GetChipsDataCallBack(JsonElement p_chipsData)
+    {
+        IEnumerable<string> enumerable = p_chipsData.EnumerateArray().Select(p_tag =>
+        {
+            if (p_tag.TryGetProperty("tag", out JsonElement tagValue))
+            {
+                return tagValue.GetString();
+            }
+
+            return null;
+        });
+
+        foreach (JsonElement tag in p_chipsData.EnumerateArray())
+        {
+            if (tag.TryGetProperty("tag", out JsonElement tagvalue))
+            {
+                string value = tagvalue.GetString();
+            }
+        }
+        IList<KeyValuePair<string,string>> keyValuePairs = JsonConvert.DeserializeObject<IEnumerable<KeyValuePair<string, string>>>(p_chipsData.GetRawText()).ToList();
+    }
+    
+    
+
+}

@@ -25,8 +25,9 @@
                 @*     <input id="tags" type="text" placeholder="Add tags here"/> *@
                 @*     <label class="active" for="tags">Tags</label> *@
                 @* </div> *@
-                <div class="chips chips-placeholder"></div>
-            </div>
+                @* <div class="chips chips-placeholder"></div> *@
+                <MaterializeChipsComponent id="tags"></MaterializeChipsComponent>            
+</div>
         </div>
         <div class="row">
             <div class="col s6">
@@ -107,7 +108,7 @@
         if (firstRender)
         {
             JSRuntime.InvokeVoidAsync("materializeHelpers.initMaterialize", null);
-            JSRuntime.InvokeVoidAsync("materializeHelpers.initChips", null);
+            // JSRuntime.InvokeVoidAsync("materializeHelpers.initChips", null);
         }
     }
 
