@@ -29,7 +29,7 @@ namespace HiddenSolutionsClient
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<CreateSolutionModel>();
+            services.AddSingleton<SolutionModel>();
             services.AddHttpClient<SolutionService>();
         }
 

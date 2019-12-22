@@ -1,0 +1,30 @@
+@page "/solution/{id}"
+@using HiddenSolutionsClient.Model
+@using HiddenSolutionsClient.Service
+@inject SolutionModel SolutionModel
+@inject SolutionService SolutionService
+
+<Header></Header>
+<div class="container">
+    <div class="col s4 offset-s6">
+        <h1>@SolutionModel.Title</h1>
+        @foreach (Tag tag in SolutionModel.Tags)
+        {
+            <div class="chip">
+                @tag.Value <i class="close material-icons">close</i>
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public string Id { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        SolutionModel solutionModel = await SolutionService.GetSolution(Id);
+        SolutionModel = solutionModel;
+    }
+}
