@@ -1,0 +1,51 @@
+@using System.Reflection.Emit
+@using Microsoft.Extensions.Options
+@inherits MaterializeBaseComponent
+@inject IJSRuntime JSRuntime
+
+<div id="@Id" name="@Name" class="input-field">
+    <select  @onchange="@OnSelectedValueChanged">
+        <option value="" disabled selected>@Placeholder</option>
+        @foreach (KeyValuePair<string, string> option in Options)
+        {
+            <option value="@option.Key">@option.Value</option>
+        }    
+</select>
+    <label>@Label</label>
+    <p>@SelectedValue></p>
+</div>
+
+@code{
+    
+    public string SelectedValue { get; set; }
+    
+    [Parameter]
+    public string Label { get; set; }
+    
+    [Parameter]
+    public string Placeholder { get; set; }
+    
+    [Parameter]
+    public EventCallback<string> SelectedValueChanged { get; set; }
+
+    private Task OnSelectedValueChanged(ChangeEventArgs p_eventArgs)
+    {
+        SelectedValue = p_eventArgs.Value.ToString();
+        return SelectedValueChanged.InvokeAsync(SelectedValue);
+    }
+    
+    
+    [Parameter]
+    public IList<KeyValuePair<string, string>> Options { get; set; }
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("materializeHelpers.initSelect", null);
+        }
+    }
+    
+    
+
+}
