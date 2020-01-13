@@ -1,0 +1,40 @@
+@using HiddenSolutionsClient.Model
+@inherits MaterializeBaseComponent
+
+<div class="solution-search-item">
+    <div class="row" style="display: flex; align-items: center; ">
+        <div class="col s6">
+            <h3>@Solution.Title</h3>
+        </div>
+        <div class="col s6" style="display: flex;flex-direction: column; align-items: flex-end ">
+            <div >@Solution.CreatedAt.ToShortDateString()</div>
+            <div >@Solution.UpdatedAt.ToShortDateString()</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+         @foreach (Tag tag in Solution.Tags)
+         {
+             <div class="chip">
+                 @tag.Value
+             </div>
+         }
+
+</div>
+    </div>
+    <div class="row">
+        <div class="col s10">
+<p>        @Solution.ProblemDescription
+</p>
+
+</div>
+<div class="col s2" style="display:flex; justify-content: flex-end;">
+    <i class="small material-icons">pageview</i>
+</div>
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public SolutionModel Solution { get; set; }
+}

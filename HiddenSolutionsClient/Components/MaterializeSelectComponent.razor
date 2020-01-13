@@ -1,5 +1,3 @@
-@using System.Reflection.Emit
-@using Microsoft.Extensions.Options
 @inherits MaterializeBaseComponent
 @inject IJSRuntime JSRuntime
 
@@ -12,7 +10,6 @@
         }    
 </select>
     <label>@Label</label>
-    <p>@SelectedValue></p>
 </div>
 
 @code{
@@ -45,6 +42,8 @@
             JSRuntime.InvokeVoidAsync("materializeHelpers.initSelect", null);
         }
     }
+    
+    
     
     
 

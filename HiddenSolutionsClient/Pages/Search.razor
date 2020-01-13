@@ -1,2 +1,62 @@
 @page "/search"
+@using HiddenSolutionsClient.Components
+@using HiddenSolutionsClient.Model
+@using HiddenSolutionsClient.Service
+@inject SolutionService SolutionService
+
 <Header></Header>
+<div class="container" style="height: 80%">
+    <div class="row">
+<h1>Search</h1>
+    <div style="display: flex;">
+        <div class="input-field" style="width:100%;">
+            <input id="search" name="search" type="text" placeholder="What are you searching for?"/>
+        </div>
+        <button style="width:15%;" type="submit" id="search-btn" name="search-btn" class="btn-large waves-effect waves-light"><i class="material-icons left">search</i> Search</button>
+    </div>
+    </div>
+
+<div class="row" style="display:flex; justify-content: space-between; align-items: flex-end; ">
+<h2 class="grey lighten-5">Results</h2>
+<p style="margin-left: auto">Showing 1 of 1000</p>
+</div>
+<hr/>
+    
+
+    <div class="row" style="overflow: auto; height: 45%">
+    @foreach (SolutionModel solutionModel in Solutions)
+    {
+        <SolutionSearchItem id="@solutionModel.Title" Solution="@solutionModel"></SolutionSearchItem>
+    }
+
+</div>
+
+<div class="row" style="display:flex; justify-content: flex-end;">
+<ul class="pagination">
+    <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+    <li class="active"><a href="#!">1</a></li>
+    <li class="waves-effect"><a href="#!">2</a></li>
+    <li class="waves-effect"><a href="#!">3</a></li>
+    <li class="waves-effect"><a href="#!">4</a></li>
+    <li class="waves-effect"><a href="#!">5</a></li>
+    <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+  </ul>
+           </div>
+
+</div>
+
+@code
+{
+    public IList<SolutionModel> Solutions { get; set; } = new List<SolutionModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Solutions = await SolutionService.GetAllSolutions();
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        Solutions = await SolutionService.GetAllSolutions();
+    }
+
+}

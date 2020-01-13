@@ -9,14 +9,11 @@ namespace HiddenSolutionsClient.Model
         public string Title { get; set; }
         public string ProblemDescription { get; set; }
         public string SolutionDescription { get; set; }
-        
         public Category Category { get; set; } = new Category();
         public IList<Tag> Tags { get; set; } = new List<Tag>();
         public IList<Image> Images { get; set; }
-        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
-        
         public string Link { get; set; }
         public DateTime LinkLastVisited { get; set; } = DateTime.Today.Date;
     }

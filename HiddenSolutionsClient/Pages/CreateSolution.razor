@@ -118,11 +118,11 @@
 
     private async void AddSolution()
     {
-        // bool success = await SolutionService.CreateSolution(SolutionModel);
-        // if (success)
-        // {
+        bool success = await SolutionService.CreateSolution(SolutionModel);
+        if (success)
+        {
             NavigationManager.NavigateTo("solution/5dffd6b121f5c56c1735ec18");
-        // }
+        }
     }
 
 }

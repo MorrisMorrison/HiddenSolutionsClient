@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -10,7 +11,6 @@ namespace HiddenSolutionsClient.Service
 {
     public class SolutionService
     {
-        
         public HttpClient Client { get; set; }
         
         public SolutionService(HttpClient p_client)
@@ -32,6 +32,18 @@ namespace HiddenSolutionsClient.Service
             {
                 SolutionModel solutionModel = JsonConvert.DeserializeObject<SolutionModel>(await httpResponseMessage.Content.ReadAsStringAsync());
                 return solutionModel;
+            }
+
+            return null;
+        }
+
+        public async Task<IList<SolutionModel>> GetAllSolutions()
+        {
+            HttpResponseMessage httpResponseMessage = await Client.GetAsync($@"http://localhost:5000/api/solution");
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                IList<SolutionModel> solutions = JsonConvert.DeserializeObject<IList<SolutionModel>>(await httpResponseMessage.Content.ReadAsStringAsync());
+                return solutions;
             }
 
             return null;
