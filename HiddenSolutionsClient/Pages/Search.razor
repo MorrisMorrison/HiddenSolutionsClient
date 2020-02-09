@@ -1,62 +1,165 @@
 @page "/search"
+@page "/search/{searchQuery}"
+@using System.Collections
 @using HiddenSolutionsClient.Components
 @using HiddenSolutionsClient.Model
 @using HiddenSolutionsClient.Service
+@using Microsoft.AspNetCore.Mvc.RazorPages
 @inject SolutionService SolutionService
+@inject SearchService SearchService
+@inject NavigationManager NavigationManager
 
 <Header></Header>
 <div class="container" style="height: 80%">
-    <div class="row">
-<h1>Search</h1>
-    <div style="display: flex;">
-        <div class="input-field" style="width:100%;">
-            <input id="search" name="search" type="text" placeholder="What are you searching for?"/>
+    <div class="row no-margin-bottom">
+        <h1>Search</h1>
+        <div style="display: flex;">
+            <div class="input-field" style="width:100%;">
+                <input id="search" name="search" type="text" placeholder="What are you searching for?"/>
+            </div>
+            <button style="width:15%;" type="submit" id="search-btn" name="search-btn" class="btn-large waves-effect waves-light"><i class="material-icons left">search</i> Search</button>
         </div>
-        <button style="width:15%;" type="submit" id="search-btn" name="search-btn" class="btn-large waves-effect waves-light"><i class="material-icons left">search</i> Search</button>
-    </div>
     </div>
 
-<div class="row" style="display:flex; justify-content: space-between; align-items: flex-end; ">
-<h2 class="grey lighten-5">Results</h2>
-<p style="margin-left: auto">Showing 1 of 1000</p>
-</div>
-<hr/>
-    
+    <div class="row no-margin-bottom" style="display:flex; justify-content: space-between; align-items: flex-end; ">
+        <h2>Results</h2>
+        <p style="margin-left: auto">Showing @SolutionsToDisplay.Count of @Solutions.Count </p>
+    </div>
+    <hr/>
 
-    <div class="row" style="overflow: auto; height: 45%">
-    @foreach (SolutionModel solutionModel in Solutions)
-    {
-        <SolutionSearchItem id="@solutionModel.Title" Solution="@solutionModel"></SolutionSearchItem>
-    }
 
-</div>
+    <div class="row no-margin-bottom">
+        @if (SolutionsToDisplay.Count > 0)
+        {
+for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
+{
+    SolutionModel solution = SolutionsToDisplay[i];
+    <SolutionSearchItem id="@solution.Title" Solution="@solution"></SolutionSearchItem>
+}
+        }
 
-<div class="row" style="display:flex; justify-content: flex-end;">
-<ul class="pagination">
-    <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
-    <li class="active"><a href="#!">1</a></li>
-    <li class="waves-effect"><a href="#!">2</a></li>
-    <li class="waves-effect"><a href="#!">3</a></li>
-    <li class="waves-effect"><a href="#!">4</a></li>
-    <li class="waves-effect"><a href="#!">5</a></li>
-    <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-  </ul>
-           </div>
 
+
+    </div>
+
+    <div class="row" style="display:flex; justify-content: flex-end; margin-top: 2%;">
+        <MaterializeSelectComponent Label="Results per page" Options="@ResultsPerPageOptions" Placeholder="5" SelectedValueChanged="@OnResultsPerPageChanged"></MaterializeSelectComponent>
+
+
+        <ul class="pagination">
+
+            <li class="disabled">
+                <a href="#!">
+                    <i class="material-icons">chevron_left</i>
+                </a>
+            </li>
+            @for (int i = 0; i < PagesCount; i++)
+            {
+                int pageNumber = i + 1;
+                if (i == 0)
+                {
+                    <li class="active">
+                        <a @onclick="@(() => OnPageNumberClicked(pageNumber))">@pageNumber</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="waves-effect">
+                        <a @onclick="@(() => OnPageNumberClicked(pageNumber))">@pageNumber</a>
+                    </li>
+                }
+            }
+            <li class="waves-effect">
+                <a href="#!">
+                    <i class="material-icons">chevron_right</i>
+                </a>
+            </li>
+        </ul>
+    </div>
+           <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome"><i class="material-icons medium">arrow_back</i></button>
 </div>
 
 @code
 {
-    public IList<SolutionModel> Solutions { get; set; } = new List<SolutionModel>();
+    
+    [Parameter]
+    public string SearchQuery { get; set; }
+
+    public IList<KeyValuePair<string, string>> ResultsPerPageOptions { get; set; } = new List<KeyValuePair<string, string>>()
+    {
+        new KeyValuePair<string, string>("5", "5"),
+        new KeyValuePair<string, string>("10", "10"),
+        new KeyValuePair<string, string>("20", "20"),
+        new KeyValuePair<string, string>("30", "30"),
+        new KeyValuePair<string, string>("50", "50"),
+    };
+
+    public int ResultsPerPage { get; set; } = 5;
+    public int ResultCount { get; set; }
+    public int PagesCount { get; set; }
+
+    private IList<SolutionModel> Solutions { get; set; } = new List<SolutionModel>();
+    public IList<SolutionModel> SolutionsToDisplay { get; set; } = new List<SolutionModel>();
 
     protected override async Task OnInitializedAsync()
     {
-        Solutions = await SolutionService.GetAllSolutions();
+        if (string.IsNullOrEmpty(SearchQuery))
+        {
+            Solutions = await SolutionService.GetAllSolutions();
+        }else
+        {
+            Solutions = await SearchService.Search(SearchQuery);
+        }
+
+        if (Solutions != null && Solutions.Count > 0)
+        {
+            SolutionsToDisplay = Solutions.ToList();
+            ResultCount = Solutions.Count;
+            PagesCount = ResultCount / ResultsPerPage;
+        }
+        else
+        {
+            Solutions = new List<SolutionModel>();
+        }
+
     }
 
-    protected override async void OnAfterRender(bool firstRender)
+
+    protected override void OnAfterRender(bool firstRender)
     {
-        Solutions = await SolutionService.GetAllSolutions();
+    }
+
+    private void OnResultsPerPageChanged(string p_resultsPerPage)
+    {
+        if (int.Parse(p_resultsPerPage) > ResultCount)
+        {
+            ResultsPerPage = ResultCount;
+        }
+        else
+        {
+            ResultsPerPage = int.Parse(p_resultsPerPage);
+        }
+        // PagesCount = (ResultCount + ResultsPerPage - 1) / ResultsPerPage;
+        PagesCount = ResultCount / ResultsPerPage;
+    }
+
+    private int OnPageNumberClicked(int pageNumber)
+    {
+        if (pageNumber > 1)
+        {
+            SolutionsToDisplay = Solutions.Skip(ResultsPerPage * (pageNumber -1)).ToList();
+            ResultCount = Solutions.Count;
+        }
+        else
+        {
+            SolutionsToDisplay = Solutions.ToList();
+        }
+        return pageNumber;
+    }
+
+    public void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/home");
     }
 
 }

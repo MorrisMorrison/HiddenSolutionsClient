@@ -84,6 +84,7 @@
             </div>
         </div>
     </div>
+           <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome"><i class="material-icons medium">arrow_back</i></button>
 </div>
 
 @code
@@ -123,6 +124,11 @@
         {
             NavigationManager.NavigateTo("solution/5dffd6b121f5c56c1735ec18");
         }
+    }
+
+    public void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/home");
     }
 
 }

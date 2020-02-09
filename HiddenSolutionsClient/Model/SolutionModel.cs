@@ -6,6 +6,7 @@ namespace HiddenSolutionsClient.Model
 {
     public class SolutionModel
     {
+        public string Id { get; set; }
         public string Title { get; set; }
         public string ProblemDescription { get; set; }
         public string SolutionDescription { get; set; }

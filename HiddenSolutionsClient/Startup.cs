@@ -30,7 +30,10 @@ namespace HiddenSolutionsClient
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<SolutionModel>();
+            
             services.AddHttpClient<SolutionService>();
+            services.AddHttpClient<SearchService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

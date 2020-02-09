@@ -3,28 +3,68 @@
 @using HiddenSolutionsClient.Service
 @inject SolutionModel SolutionModel
 @inject SolutionService SolutionService
+@inject NavigationManager NavigationManager
 
 <Header></Header>
 <div class="container">
-    <div class="col s4 offset-s6">
+    <div class="row">
         <h1>@SolutionModel.Title</h1>
-        @foreach (Tag tag in SolutionModel.Tags)
-        {
-            <div class="chip">
-                @tag.Value <i class="close material-icons">close</i>
+        <div style="display:flex; justify-content: space-between">
+            <div>
+                @foreach (Tag tag in SolutionModel.Tags)
+                {
+                    <div class="chip">
+                        @tag.Value <i class="close material-icons">close</i>
+                    </div>
+                }
             </div>
-        }
+            <div>
+            <p style="margin:0;"><span style="font-weight: bold">Created At:</span> @SolutionModel.CreatedAt.ToShortDateString()</p>
+            <p><span style="font-weight: bold">Updated At:</span> @SolutionModel.UpdatedAt.ToShortDateString()</p>
+            </div>
+        </div>
     </div>
+    <div class="row">
+        <div class="col s5">
+
+            <h5>Problem Description:</h5>
+            <p>@SolutionModel.ProblemDescription</p>
+        </div>
+<div class="col s2"></div>
+        <div class="col s5">
+
+            <h5>Solution:</h5>
+            <p>@SolutionModel.SolutionDescription</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s5">
+            <h5>Link</h5>
+            <p>Last Visited: @SolutionModel.LinkLastVisited</p>
+        </div>
+<div class="col s2">
+</div>
+        <div class="col s5">
+            <h5>Images:</h5>
+        </div>
+    </div>
+           <button class="waves-effect waves-teal btn-flat" @onclick="NavigateBack"><i class="material-icons medium">arrow_back</i></button>
 </div>
 
 @code
 {
     [Parameter]
     public string Id { get; set; }
-    
+
     protected override async Task OnInitializedAsync()
     {
         SolutionModel solutionModel = await SolutionService.GetSolution(Id);
         SolutionModel = solutionModel;
+    }
+
+    public void NavigateBack()
+    {
+        NavigationManager.NavigateTo("search");
     }
 }

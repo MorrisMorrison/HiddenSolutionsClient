@@ -38,3 +38,7 @@ app{
     border-bottom: 1px solid;
     border-bottom-color: lightgray;
 }
+
+.no-margin-bottom{
+    margin-bottom: 0;
+}

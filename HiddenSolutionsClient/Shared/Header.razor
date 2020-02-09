@@ -2,8 +2,12 @@
 
 <nav class="teal lighten-1">
     <div class="nav-wrapper">
-        <a href="" class="brand-logo" style="padding-left:1%;" @onclick="NavigateToSearch"><i class="material-icons">cloud</i>HiddenSolutions</a>
-        <form class="right">
+        @* <a href= "" class="brand-logo" style="padding-left:1%;" @onclick="NavigateToSearch"><i class="material-icons">cloud</i>HiddenSolutions</a> *@
+        <NavLink style="padding-left:1%;" class="nav-link" href="/home" Match="NavLinkMatch.All">
+                        <span class="brand-logo" aria-hidden="true"><i class="material-icons">cloud</i>HiddenSolutions</span> 
+                    </NavLink>
+@* <button @onclick=@NavigateToSearch>TEST</button> *@
+<form class="right">
             <div class="input-field">
                 <input id="search" type="search" required>
                 <label class="label-icon" for="search">
@@ -17,10 +21,4 @@
 
 @code
 {
-    
-    private void NavigateToSearch()
-    {
-        NavigationManager.NavigateTo("/");
-    }
-
 }
