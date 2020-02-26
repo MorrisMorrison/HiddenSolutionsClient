@@ -2,13 +2,13 @@
 @inject IJSRuntime JSRuntime
 
 <div id="@Id" name="@Name" class="input-field">
-    <select  @onchange="OnSelectedValueChanged">
-        <option value="" disabled selected>@Placeholder</option>
+    <InputSelect @bind-Value="@BindValue" >
+            <option value="" disabled selected>@Placeholder</option>
         @foreach (KeyValuePair<string, string> option in Options)
         {
             <option value="@option.Key">@option.Value</option>
         }    
-</select>
+    </InputSelect>
     <label>@Label</label>
 </div>
 
@@ -23,14 +23,20 @@
     public string Placeholder { get; set; }
     
     [Parameter]
+    public object BindValue { get; set; }
+    
+    [Parameter]
     public EventCallback<string> SelectedValueChanged { get; set; }
 
-    private Task OnSelectedValueChanged(ChangeEventArgs p_eventArgs)
-    {
-        SelectedValue = p_eventArgs.Value.ToString();
-        return SelectedValueChanged.InvokeAsync(SelectedValue);
-    }
     
+    
+    
+    // private Task OnSelectedValueChanged(ChangeEventArgs p_eventArgs)
+    // {
+    //     SelectedValue = p_eventArgs.Value.ToString();
+    //     return SelectedValueChanged.InvokeAsync(SelectedValue);
+    // }
+    //
     
     [Parameter]
     public IList<KeyValuePair<string, string>> Options { get; set; }

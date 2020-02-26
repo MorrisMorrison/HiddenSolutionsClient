@@ -8,6 +8,8 @@
 @inject SolutionService SolutionService
 @inject SearchService SearchService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
 
 <Header></Header>
 <div class="container" style="height: 80%">
@@ -21,21 +23,44 @@
         </div>
     </div>
 
+
     <div class="row no-margin-bottom" style="display:flex; justify-content: space-between; align-items: flex-end; ">
         <h2>Results</h2>
-        <p style="margin-left: auto">Showing @SolutionsToDisplay.Count of @Solutions.Count </p>
+        <div style="display:flex; justify-content: flex-end; align-items: center; width: 100%;">
+            <div class="input-field" style="padding-right: 1%">
+                <select multiple="multiple" @ref="categorySelectElement" @onchange="OnCategoryFilterChanged">
+                    @* <option value="" disabled selected>Choose Categories</option> *@
+                    @foreach (Category category in Categories)
+                    {
+                        <option value="@category.Name">@category.Name</option>
+                    }
+                </select>
+                <label>Categories</label>
+            </div>
+            <div class="input-field" style="padding-right: 1%">
+                <select multiple="multiple" @ref="tagSelectElement" @onchange="OnTagFilterChanged">
+                    @* <option value="" disabled selected>Choose Tags</option> *@
+                    @foreach (Tag tag in Tags)
+                    {
+                        <option value="@tag.Value">@tag.Value</option>
+                    }
+                </select>
+                <label>Tags</label>
+            </div>
+            <div>
+                <p style="margin-left: auto">Showing @SolutionsToDisplay.Count of @Solutions.Count </p>
+            </div>
+        </div>
     </div>
     <hr/>
-
-
     <div class="row no-margin-bottom">
         @if (SolutionsToDisplay.Count > 0)
         {
-for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
-{
-    SolutionModel solution = SolutionsToDisplay[i];
-    <SolutionSearchItem id="@solution.Title" Solution="@solution"></SolutionSearchItem>
-}
+            for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
+            {
+                SolutionModel solution = SolutionsToDisplay[i];
+                <SolutionSearchItem id="@solution.Title" Solution="@solution"></SolutionSearchItem>
+            }
         }
 
 
@@ -76,14 +101,19 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
             </li>
         </ul>
     </div>
-           <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome"><i class="material-icons medium">arrow_back</i></button>
+    <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome">
+        <i class="material-icons medium">arrow_back</i>
+    </button>
 </div>
 
 @code
 {
-    
+
     [Parameter]
     public string SearchQuery { get; set; }
+
+    private ElementReference categorySelectElement;
+    private ElementReference tagSelectElement;
 
     public IList<KeyValuePair<string, string>> ResultsPerPageOptions { get; set; } = new List<KeyValuePair<string, string>>()
     {
@@ -100,13 +130,19 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
 
     private IList<SolutionModel> Solutions { get; set; } = new List<SolutionModel>();
     public IList<SolutionModel> SolutionsToDisplay { get; set; } = new List<SolutionModel>();
+    public IList<Category> Categories { get; set; } = new List<Category>();
+    public IList<Tag> Tags { get; set; } = new List<Tag>();
+    public IList<string> SelectedTags { get; set; } = new List<string>();
+    public IList<string> SelectedCategories { get; set; } = new List<string>();
+
 
     protected override async Task OnInitializedAsync()
     {
         if (string.IsNullOrEmpty(SearchQuery))
         {
             Solutions = await SolutionService.GetAllSolutions();
-        }else
+        }
+        else
         {
             Solutions = await SearchService.Search(SearchQuery);
         }
@@ -114,6 +150,17 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
         if (Solutions != null && Solutions.Count > 0)
         {
             SolutionsToDisplay = Solutions.ToList();
+    // TODO
+            Categories = SolutionsToDisplay
+                .Select(p_solution => p_solution.Category)
+                .GroupBy(p_category => p_category.Name)
+                .Select(p_categoryGroup => p_categoryGroup.First())
+                .ToList();
+            Tags = SolutionsToDisplay
+                .SelectMany(p_solution => p_solution.Tags)
+                .GroupBy(p_tag => p_tag.Value)
+                .Select(p_tagGroup => p_tagGroup.First())
+                .ToList();
             ResultCount = Solutions.Count;
             PagesCount = ResultCount / ResultsPerPage;
         }
@@ -121,12 +168,11 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
         {
             Solutions = new List<SolutionModel>();
         }
-
     }
 
-
-    protected override void OnAfterRender(bool firstRender)
+    protected override async void OnAfterRender(bool firstRender)
     {
+        await JSRuntime.InvokeVoidAsync("materializeHelpers.initMaterialize", null);
     }
 
     private void OnResultsPerPageChanged(string p_resultsPerPage)
@@ -139,7 +185,7 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
         {
             ResultsPerPage = int.Parse(p_resultsPerPage);
         }
-        // PagesCount = (ResultCount + ResultsPerPage - 1) / ResultsPerPage;
+    // PagesCount = (ResultCount + ResultsPerPage - 1) / ResultsPerPage;
         PagesCount = ResultCount / ResultsPerPage;
     }
 
@@ -147,7 +193,7 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
     {
         if (pageNumber > 1)
         {
-            SolutionsToDisplay = Solutions.Skip(ResultsPerPage * (pageNumber -1)).ToList();
+            SolutionsToDisplay = Solutions.Skip(ResultsPerPage * (pageNumber - 1)).ToList();
             ResultCount = Solutions.Count;
         }
         else
@@ -162,4 +208,41 @@ for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
         NavigationManager.NavigateTo("/home");
     }
 
+    public async Task OnCategoryFilterChanged(ChangeEventArgs p_eventArgs)
+    {
+        SelectedCategories = await GetAllSelectedCategories();
+        UpdateSolutionsToDisplay();
+    }
+
+
+    public async Task OnTagFilterChanged(ChangeEventArgs p_eventArgs)
+    {
+        SelectedTags = await GetAllSelectedTags();
+        UpdateSolutionsToDisplay();
+    }
+
+    public void UpdateSolutionsToDisplay()
+    {
+        SolutionsToDisplay = Solutions.ToList();
+
+        if (SelectedTags.Count > 0)
+        {
+            SolutionsToDisplay = SolutionsToDisplay.Where(p_solution => SelectedTags.Any(p_tag => p_solution.Tags.Select(p_tag => p_tag.Value).ToList().Contains(p_tag))).ToList();
+        }
+
+        if (SelectedCategories.Count > 0)
+        {
+            SolutionsToDisplay = SolutionsToDisplay.Where(p_solution => SelectedCategories.Contains(p_solution.Category.Name)).ToList();
+        }
+    }
+
+    public async Task<List<string>> GetAllSelectedCategories()
+    {
+        return (await JSRuntime.InvokeAsync<List<string>>("getSelectedValues", categorySelectElement)).ToList();
+    }
+
+    public async Task<List<string>> GetAllSelectedTags()
+    {
+        return (await JSRuntime.InvokeAsync<List<string>>("getSelectedValues", tagSelectElement)).ToList();
+    }
 }

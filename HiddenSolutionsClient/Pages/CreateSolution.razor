@@ -2,6 +2,7 @@
 @using HiddenSolutionsClient.Components
 @using HiddenSolutionsClient.Model
 @using HiddenSolutionsClient.Service
+@using System.ComponentModel.DataAnnotations
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject SolutionModel SolutionModel
@@ -9,86 +10,100 @@
 
 <Header></Header>
 <div class="container">
-    <div class="col s4 offset-s6">
-        <h1>Create Solut<span class="teal-text lighten-1">i</span>on</h1>
-        <div class="input-field">
-            <input id="title" type="text" @bind="SolutionModel.Title"/>
-            <label for="title">Title</label>
-        </div>
-        <div class="row">
-            <div class="col s6">
-                <MaterializeSelectComponent Id="test" Label="Category" Options="@Options" Placeholder="Choose your category" SelectedValueChanged="@OnCategoryChanged">
-                </MaterializeSelectComponent>
-            </div>
-            <div class="col s6">
-                @* <div class="input-field"> *@
-                @*     <input id="tags" type="text" placeholder="Add tags here"/> *@
-                @*     <label class="active" for="tags">Tags</label> *@
-                @* </div> *@
-                @* <div class="chips chips-placeholder"></div> *@
-                <MaterializeChipsComponent id="tags" ChipsChanged="@OnChipsChanged"></MaterializeChipsComponent>            
-</div>
-        </div>
-        <div class="row">
-            <div class="col s6">
-                <div class="input-field">
-                    <textarea id="problem-description" class="materialize-textarea" placeholder="Describe the problem here ..." @bind="SolutionModel.ProblemDescription"></textarea>
-                    <label class="active" for="problem-description">Problem</label>
-                </div>
-            </div>
-            <div class="col s6">
-                <div class="input-field">
-                    <textarea id="solution-description" class="materialize-textarea" placeholder="Describe the solution here ..." @bind="SolutionModel.SolutionDescription"></textarea>
-                    <label class="active" for="solution-description">Solution</label>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col s8">
+    <EditForm EditContext="@_editContext">
+                        <DataAnnotationsValidator />
+        <div class="col s4 offset-s6">
+            <h1>Create Solut<span class="teal-text lighten-1">i</span>on</h1>
 
-                <div class="input-field">
-                    <input id="solution-link" type="text" placeholder="Paste the Url to the solution in here." @bind="SolutionModel.Link"/>
-                    <label class="active" for="solution-link">Link</label>
-                </div>
+            <div class="input-field">
+                <InputText type="text" id="title" @bind-Value="@SolutionModel.Title"/>
+                <label for="title">Title</label>
             </div>
-            <div class="col s4">
-                <div class="input-field">
-                    <i class="material-icons prefix">date_range</i>
-                    <input id="solution-link-last-visited" type="text" class="datepicker" placeholder="Click here to choose date." @bind="SolutionModel.LinkLastVisited"/>
-                    <label class="active" for="solution-link-last-visited">Last Visited</label>
-                </div>
-            </div>
-        </div>
-        <h5>(Optional)</h5>
-        <div class="row">
-            <div class="col s4">
-                <form action="#">
-                    <div class="file-field input-field">
-                        <div class="btn">
-                            <i class="material-icons right">photo</i>
-                            <span>Image</span>
-                            <input type="file">
-                        </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text" placeholder="Provide images of the solution.">
-                        </div>
+            <div class="row">
+                <div class="col s6">
+                    <div class ="input-field">
+                    <InputSelect @bind-Value="SolutionModel.Category.Name">
+                        <option value="" disabled selected>Select Category</option>
+
+                        @foreach (KeyValuePair<string, string> option in Options)
+                        {
+                            <option value="@option.Key">@option.Value</option>
+                        }
+                    </InputSelect>
                     </div>
-                </form>
+</div>
+                <div class="col s6">
+                    @* <div class="input-field"> *@
+                    @*     <input id="tags" type="text" placeholder="Add tags here"/> *@
+                    @*     <label class="active" for="tags">Tags</label> *@
+                    @* </div> *@
+                    @* <div class="chips chips-placeholder"></div> *@
+                    <MaterializeChipsComponent id="tags" ChipsChanged="@OnChipsChanged"></MaterializeChipsComponent>
+                </div>
             </div>
-            <div class="col s6">
+            <div class="row">
+                <div class="col s6">
+                    <div class="input-field">
+                        <InputTextArea id="problem-description" class="materialize-textarea" placeholder="Describe the problem here ..." @bind-Value="SolutionModel.ProblemDescription"></InputTextArea>
+                        <label class="active" for="problem-description">Problem</label>
+                    </div>
+                </div>
+                <div class="col s6">
+                    <div class="input-field">
+                        <InputTextArea id="solution-description" class="materialize-textarea" placeholder="Describe the solution here ..." @bind-Value="SolutionModel.SolutionDescription"></InputTextArea>
+                        <label class="active" for="solution-description">Solution</label>
+                    </div>
+                </div>
             </div>
-            <div class="col s2">
-                <button style="float:right;" id="create-solution" name="create-solution" class="btn-large waves-effect waves-light" type="submit" @onclick="AddSolution">
-                    <i class="material-icons right">send</i> Submit
-                </button>
+            <div class="row">
+                <div class="col s8">
+                    <div class="input-field">
+                        <InputText id="solution-link" type="text" placeholder="Paste the Url to the solution in here." @bind-Value="SolutionModel.Link"/>
+                        <label class="active" for="solution-link">Link</label>
+                    </div>
+                </div>
+                <div class="col s4">
+                    <div class="input-field">
+                        <i class="material-icons prefix">date_range</i>
+                        <InputDate id="solution-link-last-visited" type="text" class="datepicker" placeholder="Click here to choose date." @bind-Value="SolutionModel.LinkLastVisited"/>
+                        <label class="active" for="solution-link-last-visited">Last Visited</label>
+                    </div>
+                </div>
+            </div>
+            <h5>(Optional)</h5>
+            <div class="row">
+                <div class="col s4">
+                    <form action="#">
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <i class="material-icons right">photo</i>
+                                <span>Image</span>
+                                <input type="file">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Provide images of the solution.">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col s6">
+                </div>
+                <div class="col s2">
+                    <button class="btn waves-effect waves-light" type="submit" name="action" disabled="@_formInvalid">Submit
+                        <i class="material-icons right">send</i>
+                      </button>
+                </div>
             </div>
         </div>
-    </div>
-           <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome"><i class="material-icons medium">arrow_back</i></button>
+        <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome" ><i class="material-icons medium">arrow_back</i></button>
+    </EditForm>
 </div>
 
 @code
 {
+    private EditContext _editContext;
+    private bool _formInvalid = true;
+    
     private void OnCategoryChanged(string p_category)
     {
         SolutionModel.Category.Name = p_category;
@@ -96,7 +111,10 @@
 
     private void OnChipsChanged(IList<string> p_chips)
     {
-        SolutionModel.Tags = p_chips.Select(p_chip => new Tag() {Value = p_chip}).ToList();
+        SolutionModel.Tags = p_chips.Select(p_chip => new Tag()
+        {
+            Value = p_chip
+        }).ToList();
     }
     
     public IList<KeyValuePair<string, string>> Options = new List<KeyValuePair<string, string>>()
@@ -109,12 +127,14 @@
         NavigationManager.NavigateTo("details");
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            JSRuntime.InvokeVoidAsync("materializeHelpers.initMaterialize", null);
+            await JSRuntime.InvokeVoidAsync("materializeHelpers.initMaterialize", null);
         }
+        
+        _editContext.Validate();
     }
 
     private async void AddSolution()
@@ -129,6 +149,18 @@
     public void NavigateToHome()
     {
         NavigationManager.NavigateTo("/home");
+    }
+    
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(SolutionModel);
+
+        _editContext.OnFieldChanged += (_, __) =>
+        {
+            _formInvalid = !_editContext.Validate();
+            StateHasChanged();
+        };
+
     }
 
 }
