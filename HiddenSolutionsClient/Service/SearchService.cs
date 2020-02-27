@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using HiddenSolutionsClient.Config;
 using HiddenSolutionsClient.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace HiddenSolutionsClient.Service
@@ -14,17 +16,19 @@ namespace HiddenSolutionsClient.Service
         public IList<SolutionModel> Result { get; set; }
         
         public HttpClient Client { get; set; }
+        private ApiConfig _apiConfig { get; set; }
 
-        public SearchService(HttpClient p_client)
+        public SearchService(IConfiguration p_configuration,HttpClient p_client)
         {
+            _apiConfig = new ApiConfig(p_configuration);
+
             Client = p_client;
-            p_client.BaseAddress = new Uri("http://localhost:5000/");
-            
+            p_client.BaseAddress = new Uri(_apiConfig.BASEURL);
         }
 
         public async Task<IList<SolutionModel>> Search(string p_searchQuery)
         {
-            HttpResponseMessage httpResponseMessage = await Client.GetAsync($@"http://localhost:5000/api/search?searchQuery={p_searchQuery}");
+            HttpResponseMessage httpResponseMessage = await Client.GetAsync($@"{_apiConfig.BASEURL}/api/search?searchQuery={p_searchQuery}");
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 IList<SolutionModel> solutions = JsonConvert.DeserializeObject<IList<SolutionModel>>(await httpResponseMessage.Content.ReadAsStringAsync());

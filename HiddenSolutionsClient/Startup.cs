@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HiddenSolutionsClient.Config;
 using HiddenSolutionsClient.Model;
 using HiddenSolutionsClient.Service;
 using Microsoft.AspNetCore.Builder;
@@ -29,7 +30,9 @@ namespace HiddenSolutionsClient
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            
             services.AddSingleton<SolutionModel>();
+            services.AddSingleton<ApiConfig>();
             
             services.AddHttpClient<SolutionService>();
             services.AddHttpClient<SearchService>();
