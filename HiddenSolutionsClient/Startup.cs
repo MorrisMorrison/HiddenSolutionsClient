@@ -32,7 +32,6 @@ namespace HiddenSolutionsClient
             services.AddServerSideBlazor();
             
             services.AddSingleton<SolutionModel>();
-            services.AddSingleton<ApiConfig>();
             
             services.AddHttpClient<SolutionService>();
             services.AddHttpClient<SearchService>();

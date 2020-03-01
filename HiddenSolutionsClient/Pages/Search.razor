@@ -23,50 +23,63 @@
         </div>
     </div>
 
-
-    <div class="row no-margin-bottom" style="display:flex; justify-content: space-between; align-items: flex-end; ">
-        <h2>Results</h2>
-        <div style="display:flex; justify-content: flex-end; align-items: center; width: 100%;">
-            <div class="input-field" style="padding-right: 1%">
-                <select multiple="multiple" @ref="categorySelectElement" @onchange="OnCategoryFilterChanged">
-                    @* <option value="" disabled selected>Choose Categories</option> *@
-                    @foreach (Category category in Categories)
-                    {
-                        <option value="@category.Name">@category.Name</option>
-                    }
-                </select>
-                <label>Categories</label>
-            </div>
-            <div class="input-field" style="padding-right: 1%">
-                <select multiple="multiple" @ref="tagSelectElement" @onchange="OnTagFilterChanged">
-                    @* <option value="" disabled selected>Choose Tags</option> *@
-                    @foreach (Tag tag in Tags)
-                    {
-                        <option value="@tag.Value">@tag.Value</option>
-                    }
-                </select>
-                <label>Tags</label>
-            </div>
-            <div>
-                <p style="margin-left: auto">Showing @SolutionsToDisplay.Count of @Solutions.Count </p>
+    @if (IsLoading)
+    {
+            <h2>Loading ...</h2>
+            }
+    
+    @if
+        (!IsLoading && !SolutionsExist)
+    {
+        <h2>No Results found.</h2>
+    }
+    
+    @if (!IsLoading && SolutionsExist)
+    {
+        <div class="row no-margin-bottom" style="display:flex; justify-content: space-between; align-items: flex-end; ">
+            <h2>Results</h2>
+            <div style="display:flex; justify-content: flex-end; align-items: center; width: 100%;">
+                <div class="input-field" style="padding-right: 1%">
+                    <select multiple="multiple" @ref="categorySelectElement" @onchange="OnCategoryFilterChanged">
+                        @* <option value="" disabled selected>Choose Categories</option> *@
+                        @foreach (Category category in Categories)
+                        {
+                            <option value="@category.Name">@category.Name</option>
+                        }
+                    </select>
+                    <label>Categories</label>
+                </div>
+                <div class="input-field" style="padding-right: 1%">
+                    <select multiple="multiple" @ref="tagSelectElement" @onchange="OnTagFilterChanged">
+                        @* <option value="" disabled selected>Choose Tags</option> *@
+                        @foreach (Tag tag in Tags)
+                        {
+                            <option value="@tag.Value">@tag.Value</option>
+                        }
+                    </select>
+                    <label>Tags</label>
+                </div>
+                <div>
+                    <p style="margin-left: auto">Showing @SolutionsToDisplay.Count of @Solutions.Count </p>
+                </div>
             </div>
         </div>
-    </div>
-    <hr/>
-    <div class="row no-margin-bottom">
-        @if (SolutionsToDisplay.Count > 0)
-        {
-            for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
+        <hr/>
+        <div class="row no-margin-bottom">
+            @if (SolutionsToDisplay.Count > 0)
             {
-                SolutionModel solution = SolutionsToDisplay[i];
-                <SolutionSearchItem id="@solution.Title" Solution="@solution"></SolutionSearchItem>
+                for (int i = 0; i < ResultsPerPage && i < SolutionsToDisplay.Count; i++)
+                {
+                    SolutionModel solution = SolutionsToDisplay[i];
+                    <SolutionSearchItem id="@solution.Title" Solution="@solution"></SolutionSearchItem>
+                }
             }
-        }
 
 
 
-    </div>
-
+        </div>
+   
+    }
     <div class="row" style="display:flex; justify-content: flex-end; margin-top: 2%;">
         <MaterializeSelectComponent Label="Results per page" Options="@ResultsPerPageOptions" Placeholder="5" SelectedValueChanged="@OnResultsPerPageChanged"></MaterializeSelectComponent>
 
@@ -134,6 +147,8 @@
     public IList<Tag> Tags { get; set; } = new List<Tag>();
     public IList<string> SelectedTags { get; set; } = new List<string>();
     public IList<string> SelectedCategories { get; set; } = new List<string>();
+    public bool IsLoading { get; set; } = true;
+    public bool SolutionsExist { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -149,6 +164,7 @@
 
         if (Solutions != null && Solutions.Count > 0)
         {
+            SolutionsExist = true;
             SolutionsToDisplay = Solutions.ToList();
     // TODO
             Categories = SolutionsToDisplay
@@ -168,6 +184,8 @@
         {
             Solutions = new List<SolutionModel>();
         }
+        
+        IsLoading = false;
     }
 
     protected override async void OnAfterRender(bool firstRender)
