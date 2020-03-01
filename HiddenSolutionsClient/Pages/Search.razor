@@ -17,9 +17,9 @@
         <h1>Search</h1>
         <div style="display: flex;">
             <div class="input-field" style="width:100%;">
-                <input id="search" name="search" type="text" placeholder="What are you searching for?"/>
+                <input id="search" name="search" type="text" placeholder="What are you searching for?" @bind="SearchQuery"/>
             </div>
-            <button style="width:15%;" type="submit" id="search-btn" name="search-btn" class="btn-large waves-effect waves-light"><i class="material-icons left">search</i> Search</button>
+            <button style="width:15%;" type="submit" id="search-btn" name="search-btn" class="btn-large waves-effect waves-light" @onclick="NavigateToSearch"><i class="material-icons left">search</i> Search</button>
         </div>
     </div>
 
@@ -150,6 +150,10 @@
     public bool IsLoading { get; set; } = true;
     public bool SolutionsExist { get; set; }
 
+    private void NavigateToSearch()
+    {
+        NavigationManager.NavigateTo($"search/{SearchQuery}", true);
+    }
 
     protected override async Task OnInitializedAsync()
     {
