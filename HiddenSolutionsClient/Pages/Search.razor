@@ -78,42 +78,55 @@
 
 
         </div>
+       <div class="row" style="display:flex; justify-content: flex-end; margin-top: 2%;">
+           <MaterializeSelectComponent Label="Results per page" Options="@ResultsPerPageOptions" Placeholder="5" SelectedValueChanged="@OnResultsPerPageChanged"></MaterializeSelectComponent>
+           <ul class="pagination">
    
+               <li class="disabled">
+                   <a href="#!">
+                       <i class="material-icons">chevron_left</i>
+                   </a>
+               </li>
+               @for (int i = 0; i < PagesCount; i++)
+               {
+                   int pageNumber = i + 1;
+                   if (i == 0)
+                   {
+                       <li class="active">
+                           <a @onclick="@(() => OnPageNumberClicked(pageNumber))">@pageNumber</a>
+                       </li>
+                   }
+                   else
+                   {
+                       <li class="waves-effect">
+                           <a @onclick="@(() => OnPageNumberClicked(pageNumber))">@pageNumber</a>
+                       </li>
+                   }
+               }
+                       @if (PagesCount <= 1)
+                       {
+                           <li class="disabled">
+                               <a href="#!">
+                                   <i class="material-icons">chevron_right</i>
+
+                               </a>
+                           </li>
+                           
+                       }
+                       else
+                       {
+                           <li class="waves-effect">
+                               <a href="#!">
+                                   <i class="material-icons">chevron_right</i>
+
+                               </a>
+                           </li>
+                       }
+
+           </ul>
+       </div>
     }
-    <div class="row" style="display:flex; justify-content: flex-end; margin-top: 2%;">
-        <MaterializeSelectComponent Label="Results per page" Options="@ResultsPerPageOptions" Placeholder="5" SelectedValueChanged="@OnResultsPerPageChanged"></MaterializeSelectComponent>
 
-
-        <ul class="pagination">
-
-            <li class="disabled">
-                <a href="#!">
-                    <i class="material-icons">chevron_left</i>
-                </a>
-            </li>
-            @for (int i = 0; i < PagesCount; i++)
-            {
-                int pageNumber = i + 1;
-                if (i == 0)
-                {
-                    <li class="active">
-                        <a @onclick="@(() => OnPageNumberClicked(pageNumber))">@pageNumber</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="waves-effect">
-                        <a @onclick="@(() => OnPageNumberClicked(pageNumber))">@pageNumber</a>
-                    </li>
-                }
-            }
-            <li class="waves-effect">
-                <a href="#!">
-                    <i class="material-icons">chevron_right</i>
-                </a>
-            </li>
-        </ul>
-    </div>
     <button class="waves-effect waves-teal btn-flat" @onclick="NavigateToHome">
         <i class="material-icons medium">arrow_back</i>
     </button>
