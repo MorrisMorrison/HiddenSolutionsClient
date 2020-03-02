@@ -1,3 +1,5 @@
 HiddenSolutionsClient/obj/
 HiddenSolutionsClient/bin/
 HiddenSolutionsClient/*.blob
+
+Deployment/buildAndPushProdDocker.py

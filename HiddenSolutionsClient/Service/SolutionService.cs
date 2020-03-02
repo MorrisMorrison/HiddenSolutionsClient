@@ -25,10 +25,17 @@ namespace HiddenSolutionsClient.Service
             Client = p_client;
         }
 
-        public async Task<bool> CreateSolution(SolutionModel p_model)
+        public async Task<SolutionModel> CreateSolution(SolutionModel p_model)
         {
-            HttpResponseMessage response = await Client.PostAsync(new Uri($"{_apiConfig.BASEURL}/api/solution"), new StringContent(JsonConvert.SerializeObject(p_model), Encoding.UTF8, "application/json"));
-            return response.IsSuccessStatusCode;
+            HttpResponseMessage httpResponseMessage = await Client.PostAsync(new Uri($"{_apiConfig.BASEURL}/api/solution"), new StringContent(JsonConvert.SerializeObject(p_model), Encoding.UTF8, "application/json"));
+            
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                SolutionModel solutionModel = JsonConvert.DeserializeObject<SolutionModel>(await httpResponseMessage.Content.ReadAsStringAsync());
+                return solutionModel;
+            }
+
+            return null;
         }
 
         public async Task<SolutionModel> GetSolution(string p_id)

@@ -139,11 +139,12 @@
 
     private async void AddSolution()
     {
-        bool success = await SolutionService.CreateSolution(SolutionModel);
-        if (success)
+        SolutionModel solutionModel = await SolutionService.CreateSolution(SolutionModel);
+        if (solutionModel != null)
         {
-            NavigationManager.NavigateTo("solution/5dffd6b121f5c56c1735ec18");
+            NavigationManager.NavigateTo($"solution/{solutionModel.Id}");
         }
+
     }
 
     public void NavigateToHome()
